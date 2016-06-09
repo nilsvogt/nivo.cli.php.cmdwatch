@@ -1,0 +1,78 @@
+#!/usr/bin/env php
+<?PHP
+
+Class CmdWatch {
+
+	/**
+	 * Checksum of the file being watched
+	 * @var string
+	 */
+	protected $checksum;
+
+	/**
+	 * Command Being Processed After Change
+	 * @var string
+	 */
+	protected $cmd;
+
+	/**
+	 * Path To The File Of Interest
+	 */
+	protected $path_file;
+
+	public function __construct(){
+		$this->path_file = $_SERVER['argv'][1];
+		$this->cmd = $_SERVER['argv'][2];
+		$this->checksum = $this->getChecksum();
+		$this->run();
+	}
+
+	protected function run(){
+		$this->applyCommand();
+
+		while(1){
+			sleep(0.5); // dont get too busy
+			if($this->checkUpdate()){
+				$this->applyCommand();
+			}
+		}
+	}
+
+	/**
+	 * Check For Updates
+	 * Check if file was altered OR any user input was received
+	 * @return bool Indicates whether or not file was altered
+	 */
+	protected function checkUpdate(){
+		$userInput = fgets(STDIN);
+		$targetfileAltered = $this->getChecksum() !== $this->checksum;
+
+		if(!$userInput && !$targetfileAltered){
+			return false;
+		}
+
+		$this->checksum = $this->getChecksum();
+
+		return true;
+	}
+
+	/**
+	 * Clear Screen And Apply Passed Target Command
+	 * @return void
+	 */
+	protected function applyCommand(){
+		echo shell_exec('clear && echo "' . $this->cmd . '" && ' . $this->cmd);
+	}
+
+	/**
+	 * Get MD5 Of Passed File
+	 * @return [type] [description]
+	 */
+	protected function getChecksum(){
+		return md5_file(__DIR__ . DIRECTORY_SEPARATOR . $this->path_file);
+	}
+}
+
+(new CmdWatch);
+
+?>
