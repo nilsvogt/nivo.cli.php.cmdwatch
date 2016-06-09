@@ -1,0 +1,12 @@
+{
+    "name": "nivo/cmdwatch",
+    "description": "watches a file for modifications and executes passed command",
+    "authors": [
+        {
+            "name": "Nils Vogt",
+            "email": "hello.nils.vogt@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
